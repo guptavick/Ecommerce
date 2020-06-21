@@ -5,10 +5,16 @@ from math import ceil
 
 
 def index(request):
-    products = Product.objects.all()
-    product_count = Product.objects.all().count()
-    slide_count = (product_count//4) + ceil((product_count/4)-product_count//4)
-    return render(request, 'crazysite/index.html', {'products':products,'slide_count':slide_count, 'range': range(1,slide_count)})
+    categories = Product.objects.values_list('category', flat = True).distinct()
+    allprods = []
+    for cat in categories:
+        products = Product.objects.filter(category = cat)
+        product_count = len(products)
+        slide_count = (product_count//4) + ceil((product_count/4)-product_count//4)
+
+        allprods.append([products, range(1, slide_count), slide_count])
+
+    return render(request,  'crazysite/index.html', {'allprods':allprods})
 
 def aboutus(request):
     return render(request, 'crazysite/about.html')
